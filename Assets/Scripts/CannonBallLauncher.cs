@@ -25,7 +25,7 @@ public class CannonBallLauncher : MonoBehaviour
             if (ball.TryGetComponent(out Rigidbody rb))
             {
                 rb.AddForce(direction * _speed, ForceMode.Impulse);
-                Destroy(ball, 10);
+                Destroy(ball, 100);
             }
             else
             {
