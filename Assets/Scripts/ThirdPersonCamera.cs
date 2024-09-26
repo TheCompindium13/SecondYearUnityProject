@@ -22,7 +22,9 @@ public class ThirdPersonCamera : MonoBehaviour
     public float rotationSpeed = 5.0f;
 
     private Vector3 offset;
-
+    // Movement speed of the player
+    [SerializeField]
+    private float movementSpeed = 5.0f;
     private void Awake()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -34,20 +36,37 @@ public class ThirdPersonCamera : MonoBehaviour
         ResetOffset();
     }
 
-    void LateUpdate()
+    private void FixedUpdate()
     {
         // Calculate desired position based on player's position and offset
         Vector3 desiredPosition = player.position + offset;
 
         // Smoothly interpolate towards the desired position
-        Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
-        transform.position = smoothedPosition;
+        //Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
+        transform.position = desiredPosition;
 
         // Rotate the camera to look at the player
         transform.LookAt(player.position);
+        // Get input for movement
+        float moveX = Input.GetAxis("Horizontal");
+        float moveZ = Input.GetAxis("Vertical");
 
+        // Create a movement vector based on camera direction
+        Vector3 forward = player.transform.TransformDirection(Vector3.forward);
+        Vector3 right = player.transform.TransformDirection(Vector3.right);
+
+        // Calculate movement direction
+        Vector3 moveDir = (forward * moveZ + right * moveX).normalized;
+
+        // Scale the movement direction by the movement speed
+        Vector3 velocity = moveDir * movementSpeed * Time.fixedDeltaTime;
+        // Move the player
+        player.position += moveDir * movementSpeed * Time.fixedDeltaTime;
+        
         // Handle camera rotation based on input
         HandleCameraRotation();
+        
+
     }
 
     private void HandleCameraRotation()
@@ -70,5 +89,6 @@ public class ThirdPersonCamera : MonoBehaviour
     {
         // Reset the camera offset based on current player position
         offset = new Vector3(0, height, -distance);
+        transform.rotation = player.rotation;
     }
 }

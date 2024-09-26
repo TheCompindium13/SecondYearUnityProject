@@ -45,11 +45,6 @@ public class PlayerMovementBehaviour : MonoBehaviour
 
         // Smoothly move the player
         _rigidbody.MovePosition(transform.position + velocity);
-
-    }
-    private void Update()
-    {
-        
         // Handle turning with Q and E
         if (Input.GetKey(KeyCode.Q))
         {
@@ -63,8 +58,11 @@ public class PlayerMovementBehaviour : MonoBehaviour
         // Handle jumping
         if (Input.GetKeyDown(KeyCode.Space) && _isGrounded)
         {
-            Jump();
+            _rigidbody.AddForce(Vector3.up * _jumpForce, ForceMode.Impulse);
+            _isGrounded = false;
+            //Jump();
         }
+
     }
 
     private void Jump()
@@ -88,7 +86,13 @@ public class PlayerMovementBehaviour : MonoBehaviour
         // Check if the player is on the ground
         if (collision.gameObject.CompareTag("Ground"))
         {
+            _rigidbody.AddForce(Vector3.back * 10, ForceMode.Impulse);
             _isGrounded = true; // Player is grounded
+        }
+        if (collision.gameObject.CompareTag("Wall"))
+        {
+            _rigidbody.AddForce(Vector3.back * 10, ForceMode.VelocityChange);
+
         }
     }
 

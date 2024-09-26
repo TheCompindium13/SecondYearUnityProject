@@ -38,7 +38,7 @@ public class FirstPersonCamera : MonoBehaviour
         transform.rotation = playerBody.rotation;
     }
 
-    void Update()
+    void LateUpdate()
     {
         if (playerBody != null)
         {
@@ -57,8 +57,7 @@ public class FirstPersonCamera : MonoBehaviour
             verticalRotation -= mouseY;
             verticalRotation = Mathf.Clamp(verticalRotation, -upDownLookLimit, upDownLookLimit);
 
-            // Apply rotation to the camera and player body
-            HandleCameraRotation();
+
 
             // Handle player movement
             MovePlayer();
@@ -77,7 +76,10 @@ public class FirstPersonCamera : MonoBehaviour
 
         // Update offset to maintain the distance while allowing for rotation
         Quaternion rotation = Quaternion.Euler(0, rotationY, 0);
-         // Update the offset based on rotation
+        // Update the offset based on rotation
+        transform.rotation = playerBody.rotation;
+
+
     }
 
     private void MovePlayer()
@@ -86,11 +88,33 @@ public class FirstPersonCamera : MonoBehaviour
         float moveX = Input.GetAxis("Horizontal");
         float moveZ = Input.GetAxis("Vertical");
 
-        // Calculate the direction to move based on player rotation
-        Vector3 move = playerBody.right * moveX + playerBody.forward * moveZ;
-        move.y = 0; // Prevent vertical movement
+        // Create a movement vector based on camera direction
+        Vector3 forward = transform.TransformDirection(Vector3.forward);
+        Vector3 right = transform.TransformDirection(Vector3.right);
+
+        // Calculate movement direction
+        Vector3 moveDir = (forward * moveZ + right * moveX).normalized;
+
+        // Scale the movement direction by the movement speed
+        Vector3 velocity = moveDir * movementSpeed * Time.fixedDeltaTime;
 
         // Move the player
-        playerBody.position += move * movementSpeed * Time.deltaTime;
+        playerBody.position += moveDir * movementSpeed * Time.deltaTime;
+
+        float horizontalInput = Input.GetAxis("Mouse X");
+
+        // Calculate rotation angle
+        float rotationY = horizontalInput * mouseSensitivity;
+
+        // Rotate the player around the camera
+        playerBody.Rotate(0, rotationY, 0);
+
+        // Update offset to maintain the distance while allowing for rotation
+        Quaternion rotation = Quaternion.Euler(0, rotationY, 0);
+        transform.rotation = playerBody.rotation;
+
+        // Smoothly move the player
+        playerBody.GetComponent<Rigidbody>().MovePosition(transform.position + velocity);
+
     }
 }
