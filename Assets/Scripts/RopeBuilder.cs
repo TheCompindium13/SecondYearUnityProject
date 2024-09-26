@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
-
+[RequireComponent(typeof(Rigidbody))]
 public class RopeBuilder : MonoBehaviour
 {
     // Variables to hold rope properties
@@ -11,7 +11,12 @@ public class RopeBuilder : MonoBehaviour
     private float m_Length;
     [SerializeField]
     private int m_segmentNumber;
+    private Rigidbody _rigidbody;  // Reference to the Rigidbody component
 
+    private void Awake()
+    {
+        _rigidbody = GetComponent<Rigidbody>();
+    }
     // Start called when the script instance is being loaded
     private void Start()
     {
@@ -47,7 +52,7 @@ public class RopeBuilder : MonoBehaviour
             // Make the first segment kinematic
             if (i == 0)
             {
-                m_segment.GetComponent<Rigidbody>().isKinematic = true;
+                _rigidbody.isKinematic = true;
             }
 
             // Add the segment to the list
@@ -56,6 +61,7 @@ public class RopeBuilder : MonoBehaviour
             // Connect to the previous segment if it's not the first one
             if (i > 0)
             {
+                _rigidbody.isKinematic = false;
                 ConnectSegments(m_segments[i - 1], m_segment);
             }
         }
@@ -70,18 +76,18 @@ public class RopeBuilder : MonoBehaviour
     // Connect two segments with a joint
     private void ConnectSegments(GameObject previousSegment, GameObject currentSegment)
     {
-        FixedJoint joint = currentSegment.AddComponent<FixedJoint>();
+        SpringJoint joint = currentSegment.GetComponent<SpringJoint>();
         joint.connectedBody = previousSegment.GetComponent<Rigidbody>();
     }
 
     // Optional: Update rope dynamically (e.g., on user input)
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Plus) || Input.GetKeyDown(KeyCode.KeypadPlus))
+        if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             AddSegment();
         }
-        if (Input.GetKeyDown(KeyCode.Minus) || Input.GetKeyDown(KeyCode.KeypadMinus))
+        if (Input.GetKeyDown(KeyCode.Mouse1) )
         {
             RemoveSegment();
         }
@@ -118,17 +124,36 @@ public class RopeBuilder : MonoBehaviour
         // Check if there are segments to remove
         if (m_segments.Count > 0)
         {
-            // Destroy the last segment
+            // Get the last segment and its index
             GameObject m_lastSegment = m_segments[m_segments.Count - 1];
-            Destroy(m_lastSegment);
-            m_segments.RemoveAt(m_segments.Count - 1);
+            int lastIndex = m_segments.Count - 1;
 
-            // Reconnect the last remaining segment to the one before it if necessary
-            if (m_segments.Count > 0)
+            // If there are at least two segments
+            if (lastIndex > 0)
             {
-                // You might want to add logic to reconnect the remaining segments here
-                // This could involve removing the joint from the last segment and reconnecting it to the new last segment
+                // Get the previous segment
+                GameObject m_previousSegment = m_segments[lastIndex - 1];
+                SpringJoint lastJoint = m_lastSegment.GetComponent<SpringJoint>();
+
+                // Remove the joint from the last segment
+                if (lastJoint != null)
+                {
+                    Destroy(lastJoint);
+                }
+
+                // Optionally, add a new joint to reconnect the previous segment to the last remaining segment
+                SpringJoint newJoint = m_previousSegment.GetComponent<SpringJoint>();
+                newJoint.connectedBody = m_previousSegment.GetComponent<Rigidbody>();
+                newJoint.spring = 1000f; // Adjust the spring value as needed
+                newJoint.damper = 100f;  // Adjust the damper value as needed
+                newJoint.autoConfigureConnectedAnchor = false; // Configure anchors manually if needed
+                newJoint.anchor = Vector3.zero; // Set anchor for previous segment
+                newJoint.connectedAnchor = new Vector3(0, m_Length, 0); // Set anchor for current segment
             }
+
+            // Destroy the last segment and remove it from the list
+            Destroy(m_lastSegment);
+            m_segments.RemoveAt(lastIndex);
         }
     }
 }

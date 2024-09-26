@@ -3,10 +3,11 @@ using UnityEngine;
 public class FollowCamera : MonoBehaviour
 {
     [SerializeField]
-    public Transform target;       // The target the camera will follow
+    private Transform target;       // The target the camera will follow
     [SerializeField]
-    public Vector3 offset;         // Offset position from the target
-    public float smoothSpeed = 0.125f; // Smoothing speed
+    private Vector3 offset;         // Offset position from the target
+    [SerializeField]
+    private float smoothSpeed = 0.125f; // Smoothing speed
 
     void LateUpdate()
     {

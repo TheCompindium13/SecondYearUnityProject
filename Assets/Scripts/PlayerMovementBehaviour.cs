@@ -8,11 +8,16 @@ public class PlayerMovementBehaviour : MonoBehaviour
     [SerializeField]
     private float _moveSpeed;
 
-    [Tooltip("The current active camera. Used to get mouse position for rotation.")]
+    [Tooltip("Jump force for the player.")]
+    [SerializeField]
+    private float _jumpForce;
+
+    [Tooltip("Reference to the active camera.")]
     [SerializeField]
     private Camera _camera;
 
     private Rigidbody _rigidbody;
+    private bool _isGrounded;
 
     // Start is called before the first frame update
     void Start()
@@ -23,6 +28,7 @@ public class PlayerMovementBehaviour : MonoBehaviour
 
     private void FixedUpdate()
     {
+        // Handle movement
         // Get input values for movement
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
@@ -35,11 +41,15 @@ public class PlayerMovementBehaviour : MonoBehaviour
         Vector3 moveDir = (forward * verticalInput + right * horizontalInput).normalized;
 
         // Scale the movement direction by the movement speed
-        Vector3 velocity = moveDir * _moveSpeed * Time.deltaTime;
+        Vector3 velocity = moveDir * _moveSpeed * Time.fixedDeltaTime;
 
         // Smoothly move the player
         _rigidbody.MovePosition(transform.position + velocity);
 
+    }
+    private void Update()
+    {
+        
         // Handle turning with Q and E
         if (Input.GetKey(KeyCode.Q))
         {
@@ -50,7 +60,18 @@ public class PlayerMovementBehaviour : MonoBehaviour
             RotatePlayerAndCamera(5); // Turn right
         }
 
-        
+        // Handle jumping
+        if (Input.GetKeyDown(KeyCode.Space) && _isGrounded)
+        {
+            Jump();
+        }
+    }
+
+    private void Jump()
+    {
+        // Apply an upward force to the Rigidbody for jumping
+        _rigidbody.AddForce(Vector3.up * _jumpForce, ForceMode.Impulse);
+        _isGrounded = false; // Set grounded state to false
     }
 
     private void RotatePlayerAndCamera(float angle)
@@ -60,5 +81,23 @@ public class PlayerMovementBehaviour : MonoBehaviour
 
         // Rotate the camera (assuming it's a child of the player)
         _camera.transform.rotation *= rotation;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        // Check if the player is on the ground
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            _isGrounded = true; // Player is grounded
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        // Check if the player has left the ground
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            _isGrounded = false; // Player is no longer grounded
+        }
     }
 }
