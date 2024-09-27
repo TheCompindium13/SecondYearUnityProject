@@ -83,7 +83,7 @@ public class ThirdPersonCamera : MonoBehaviour
         float horizontalInput = Input.GetAxis("Mouse X");
 
         // Calculate rotation angle
-        float rotationY = horizontalInput * rotationSpeed;
+        float rotationY = horizontalInput * smoothSpeed;
 
         // Rotate the player around the camera
         player.Rotate(0, rotationY, 0);
