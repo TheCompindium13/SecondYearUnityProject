@@ -42,11 +42,20 @@ public class ThirdPersonCamera : MonoBehaviour
         Vector3 desiredPosition = player.position + offset;
 
         // Smoothly interpolate towards the desired position
-        //Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
-        transform.position = desiredPosition;
+        transform.position = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
 
-        // Rotate the camera to look at the player
-        transform.LookAt(player.position);
+        // Calculate the direction to the player
+        Vector3 direction = player.position - transform.position;
+        direction.y = 0; // Ignore vertical direction for horizontal rotation
+        if (direction != Vector3.zero)
+        {
+            // Calculate the target rotation
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+
+            // Smoothly rotate towards the player
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, smoothSpeed);
+        }
+
         // Get input for movement
         float moveX = Input.GetAxis("Horizontal");
         float moveZ = Input.GetAxis("Vertical");
@@ -60,13 +69,12 @@ public class ThirdPersonCamera : MonoBehaviour
 
         // Scale the movement direction by the movement speed
         Vector3 velocity = moveDir * movementSpeed * Time.fixedDeltaTime;
+
         // Move the player
-        player.position += moveDir * movementSpeed * Time.fixedDeltaTime;
-        
+        player.position += velocity;
+
         // Handle camera rotation based on input
         HandleCameraRotation();
-        
-
     }
 
     private void HandleCameraRotation()
