@@ -35,7 +35,9 @@ public class PlayerMovementBehaviour : MonoBehaviour
 
         // Create a movement vector based on camera direction
         Vector3 forward = _camera.transform.TransformDirection(Vector3.forward);
+        forward.y = 0; // Ignore vertical component
         Vector3 right = _camera.transform.TransformDirection(Vector3.right);
+        right.y = 0; // Ignore vertical component
 
         // Calculate movement direction
         Vector3 moveDir = (forward * verticalInput + right * horizontalInput).normalized;
@@ -45,6 +47,7 @@ public class PlayerMovementBehaviour : MonoBehaviour
 
         // Smoothly move the player
         _rigidbody.MovePosition(transform.position + velocity);
+
         // Handle turning with Q and E
         if (Input.GetKey(KeyCode.Q))
         {
@@ -58,14 +61,11 @@ public class PlayerMovementBehaviour : MonoBehaviour
         // Handle jumping
         if (Input.GetKeyDown(KeyCode.Space) && _isGrounded)
         {
-            _rigidbody.AddForce(Vector3.up * _jumpForce, ForceMode.Impulse);
-            _isGrounded = false;
-            //Jump();
+            Jump();
         }
-
     }
 
-    private void Jump()
+    public void Jump()
     {
         // Apply an upward force to the Rigidbody for jumping
         _rigidbody.AddForce(Vector3.up * _jumpForce, ForceMode.Impulse);
@@ -86,13 +86,7 @@ public class PlayerMovementBehaviour : MonoBehaviour
         // Check if the player is on the ground
         if (collision.gameObject.CompareTag("Ground"))
         {
-            _rigidbody.AddForce(Vector3.back * 10, ForceMode.Impulse);
             _isGrounded = true; // Player is grounded
-        }
-        if (collision.gameObject.CompareTag("Wall"))
-        {
-            _rigidbody.AddForce(Vector3.back * 10, ForceMode.VelocityChange);
-
         }
     }
 

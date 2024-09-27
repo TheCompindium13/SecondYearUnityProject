@@ -28,14 +28,22 @@ public class FirstPersonCamera : MonoBehaviour
 
     // Store the current vertical rotation
     private float verticalRotation = 0.0f;
+    private PlayerMovementBehaviour playerMovement;
 
     void Start()
     {
-        // Lock the cursor to the center of the screen
         Cursor.lockState = CursorLockMode.Locked;
-
-        // Set the initial rotation of the camera to match the player's rotation
         transform.rotation = playerBody.rotation;
+        playerMovement = playerBody.GetComponent<PlayerMovementBehaviour>(); // Get the PlayerMovementBehaviour
+    }
+
+
+    private void HandleJumpInput()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            playerMovement.Jump(); // Call the jump method
+        }
     }
 
     void LateUpdate()
@@ -61,6 +69,7 @@ public class FirstPersonCamera : MonoBehaviour
 
             // Handle player movement
             MovePlayer();
+            HandleJumpInput();
         }
     }
     private void HandleCameraRotation()
