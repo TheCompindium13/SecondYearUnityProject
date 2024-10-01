@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Animator))]
 public class PlayerMovementBehaviour : MonoBehaviour
 {
     [Tooltip("How fast the player will move.")]
@@ -17,18 +18,18 @@ public class PlayerMovementBehaviour : MonoBehaviour
     private Camera _camera;
 
     private Rigidbody _rigidbody;
+    private Animator _animator;
     private bool _isGrounded;
 
     // Start is called before the first frame update
     void Start()
     {
-        // Store reference to the attached Rigidbody
         _rigidbody = GetComponent<Rigidbody>();
+        _animator = GetComponent<Animator>();
     }
 
     private void FixedUpdate()
     {
-        // Handle movement
         // Get input values for movement
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
@@ -48,6 +49,32 @@ public class PlayerMovementBehaviour : MonoBehaviour
         // Smoothly move the player
         _rigidbody.MovePosition(transform.position + velocity);
 
+        // Set Animator parameters using switch statement
+
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            verticalInput = Input.GetAxis("Vertical");
+        }
+        else 
+        {
+            verticalInput = Mathf.Clamp(verticalInput, 0, .5f);
+
+        }
+        UpdateAnimatorParameters(verticalInput, horizontalInput);
+
+        HandleTurning();
+        HandleJumping();
+    }
+
+    private void UpdateAnimatorParameters(float verticalInput, float horizontalInput)
+    {
+        // Update Speed and Direction based on input
+        _animator.SetFloat("Speed", verticalInput); // Forward/backward movement
+        _animator.SetFloat("Direction", horizontalInput); // Left/right movement
+    }
+
+    private void HandleTurning()
+    {
         // Handle turning with Q and E
         if (Input.GetKey(KeyCode.Q))
         {
@@ -57,7 +84,10 @@ public class PlayerMovementBehaviour : MonoBehaviour
         {
             RotatePlayerAndCamera(5); // Turn right
         }
+    }
 
+    private void HandleJumping()
+    {
         // Handle jumping
         if (Input.GetKeyDown(KeyCode.Space) && _isGrounded)
         {
@@ -68,6 +98,7 @@ public class PlayerMovementBehaviour : MonoBehaviour
     public void Jump()
     {
         // Apply an upward force to the Rigidbody for jumping
+        _animator.SetBool("Jump", true); // Set jumping animation state
         _rigidbody.AddForce(Vector3.up * _jumpForce, ForceMode.Impulse);
         _isGrounded = false; // Set grounded state to false
     }
@@ -96,6 +127,7 @@ public class PlayerMovementBehaviour : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             _isGrounded = false; // Player is no longer grounded
+            _animator.SetBool("Jump", false); // Update grounded state in animator
         }
     }
 }
