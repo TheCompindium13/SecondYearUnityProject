@@ -27,7 +27,7 @@ public class ThirdPersonCamera : MonoBehaviour
     private float movementSpeed = 5.0f;
     private void Awake()
     {
-        Cursor.lockState = CursorLockMode.Locked;
+        //Cursor.lockState = CursorLockMode.Locked;
     }
 
     void Start()

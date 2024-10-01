@@ -32,7 +32,7 @@ public class FirstPersonCamera : MonoBehaviour
 
     void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
+        //Cursor.lockState = CursorLockMode.Locked;
         transform.rotation = playerBody.rotation;
         playerMovement = playerBody.GetComponent<PlayerMovementBehaviour>(); // Get the PlayerMovementBehaviour
     }

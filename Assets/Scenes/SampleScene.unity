@@ -15651,7 +15651,7 @@ MonoBehaviour:
   upDownLookLimit: 80
   playerBody: {fileID: 1990671775}
   m_camera: {fileID: 963194227}
-  smoothSpeed: 53.89
+  smoothSpeed: 50
 --- !u!114 &963194230
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15667,9 +15667,9 @@ MonoBehaviour:
   player: {fileID: 1990671775}
   distance: 3
   height: 2
-  smoothSpeed: 112
-  rotationSpeed: 5
-  movementSpeed: 5
+  smoothSpeed: 50
+  rotationSpeed: 50
+  movementSpeed: 10
 --- !u!1001 &963880941
 PrefabInstance:
   m_ObjectHideFlags: 0
