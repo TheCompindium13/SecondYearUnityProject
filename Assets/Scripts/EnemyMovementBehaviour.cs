@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 [RequireComponent(typeof(Rigidbody))]
 public class EnemyMovementBehaviour : MonoBehaviour
@@ -26,12 +27,17 @@ public class EnemyMovementBehaviour : MonoBehaviour
     private float _maxVelocity = 10;
 
     private Animator _animator;
-
+    private NavMeshAgent _navAgent;
     private void Awake()
     {
+        _rigidbody = GetComponent<Rigidbody>();
+        _navAgent = GetComponent<NavMeshAgent>();
+        _animator = GetComponent<Animator>();
+
     }
     void Start()
     {
+        _navAgent = GetComponent<NavMeshAgent>();
         _rigidbody = GetComponent<Rigidbody>();
 
         _animator = GetComponent<Animator>();
@@ -45,6 +51,8 @@ public class EnemyMovementBehaviour : MonoBehaviour
         //If a target hasn't been set return
         if (!_target)
             return;
+        _navAgent.SetDestination(_target.transform.position);
+
         // Get input values for movement
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
@@ -58,35 +66,20 @@ public class EnemyMovementBehaviour : MonoBehaviour
         _rigidbody.MovePosition(transform.position + velocity);
         _rigidbody.transform.LookAt(_target.transform, Vector3.up);
         //If the velocity goes over the max magnitude, clamp it
-
-        UpdateAnimatorParameters(verticalInput, horizontalInput);
-    }
-
-    private void UpdateAnimatorParameters(float verticalInput, float horizontalInput)
-    {
-        // Update Speed and Direction based on input
-        _animator.SetFloat("Speed", verticalInput); // Forward/backward movement
+        //If the velocity goes over the max magnitude, clamp it
+        //If the velocity goes over the max magnitude, clamp it
+        if (_navAgent.velocity.magnitude > _maxVelocity)
+            _navAgent.velocity = _navAgent.velocity.normalized * _maxVelocity;
+        if (_rigidbody.velocity.magnitude > _maxVelocity)
+            _rigidbody.velocity = _rigidbody.velocity.normalized * _maxVelocity;
+        _animator.SetFloat("Speed", moveDir.magnitude); // Forward/backward movement
         _animator.SetFloat("Direction", horizontalInput); // Left/right movement
     }
 
-
-
-    private void OnCollisionEnter(Collision collision)
+        private void UpdateAnimatorParameters(float verticalInput, float horizontalInput)
     {
-        // Check if the player is on the ground
-        if (collision.gameObject.CompareTag("Ground"))
-        {
-            _isGrounded = true; // Player is grounded
-        }
+        // Update Speed and Direction based on input
 
     }
 
-    private void OnCollisionExit(Collision collision)
-    {
-        // Check if the player has left the ground
-        if (collision.gameObject.CompareTag("Ground"))
-        {
-            _isGrounded = false; // Player is no longer grounded
-        }
-    }
 }
