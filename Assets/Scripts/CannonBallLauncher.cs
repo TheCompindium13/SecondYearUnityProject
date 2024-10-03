@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class CannonBallLauncher : MonoBehaviour
@@ -8,6 +9,8 @@ public class CannonBallLauncher : MonoBehaviour
     private GameObject _cannonballPrefab;
     [SerializeField]
     private float _speed;
+
+    private GameObject m_other;
 
     private void Update()
     {
@@ -24,7 +27,9 @@ public class CannonBallLauncher : MonoBehaviour
             GameObject ball = Instantiate(_cannonballPrefab, transform.position, Quaternion.identity);
             if (ball.TryGetComponent(out Rigidbody rb))
             {
+                
                 rb.AddForce(direction * _speed, ForceMode.Impulse);
+
                 Destroy(ball, 100);
             }
             else
@@ -33,4 +38,5 @@ public class CannonBallLauncher : MonoBehaviour
             }
         }
     }
+
 }

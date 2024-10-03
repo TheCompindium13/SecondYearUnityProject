@@ -17,16 +17,22 @@ public class PlayerMovementBehaviour : MonoBehaviour
     [SerializeField]
     private Camera _camera;
 
+    private bool _isGrounded;
     private Rigidbody _rigidbody;
     private Animator _animator;
-    private bool _isGrounded;
 
-    // Start is called before the first frame update
+    private void Awake()
+    {
+    }
     void Start()
     {
         _rigidbody = GetComponent<Rigidbody>();
+
         _animator = GetComponent<Animator>();
     }
+
+    // Start is called before the first frame update
+
 
     private void FixedUpdate()
     {
@@ -119,6 +125,7 @@ public class PlayerMovementBehaviour : MonoBehaviour
         {
             _isGrounded = true; // Player is grounded
         }
+
     }
 
     private void OnCollisionExit(Collision collision)

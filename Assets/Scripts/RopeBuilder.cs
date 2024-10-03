@@ -83,11 +83,11 @@ public class RopeBuilder : MonoBehaviour
     // Optional: Update rope dynamically (e.g., on user input)
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Mouse0))
+        if (Input.GetKeyDown(KeyCode.Plus))
         {
             AddSegment();
         }
-        if (Input.GetKeyDown(KeyCode.Mouse1) )
+        if (Input.GetKeyDown(KeyCode.Minus) )
         {
             RemoveSegment();
         }
