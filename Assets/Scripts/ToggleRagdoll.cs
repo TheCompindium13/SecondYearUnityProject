@@ -5,7 +5,7 @@ using UnityEngine;
 public class ToggleRagdoll : MonoBehaviour
 {
     private Rigidbody _rigidbody;
-    private Animator _animator;
+
 
     private void Awake()
     {
@@ -14,10 +14,8 @@ public class ToggleRagdoll : MonoBehaviour
     void Start()
     {
         RagdollToggle(false);
-        Invoke(nameof(SetRagdoll), 3);
-        _animator = GetComponent<Animator>();
     }
-    private void SetRagdoll() => RagdollToggle(true);
+    private void SetRagdolltoOn() => RagdollToggle(true);
     public void RagdollToggle(bool enabled)
     {
         TryGetComponent(out Collider collider);
@@ -42,9 +40,13 @@ public class ToggleRagdoll : MonoBehaviour
     }
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Ball"))
+        if (collision.gameObject.CompareTag("Cannonball") )
         {
-            SetRagdoll();
+            SetRagdolltoOn();
+        }
+        else if (collision.gameObject.CompareTag("Player"))
+        {
+            SetRagdolltoOn();
         }
     }
 }
